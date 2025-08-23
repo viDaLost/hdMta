@@ -1,192 +1,113 @@
-// Тексты для языков
-const translations = {
-    ru: {
-        title: "Матрёшки",
-        rulesBtn: "Правила",
-        rulesTitle: "Правила",
-        currentPlayer: "Игрок: ",
-        rules: "Игроки ходят по очереди. Фигуру можно ставить на пустую клетку или поверх меньшей (включая вражеские). Нельзя ставить на такую же или большую. Каждая фигура используется раз. Победа — линия из трёх своих фигур по горизонтали, вертикали или диагонали. Ничья — если фигуры закончились без победителя.",
-        win: "Игрок %d победил!",
-        draw: "Ничья!"
-    },
-    en: {
-        title: "Matryoshkas",
-        rulesBtn: "Rules",
-        rulesTitle: "Rules",
-        currentPlayer: "Player: ",
-        rules: "Players take turns. A piece can be placed on an empty cell or over a smaller one (including opponent's). You cannot place on the same or larger size. Each piece is used once. Win by aligning three of your pieces horizontally, vertically, or diagonally. Draw if all pieces are used with no winner.",
-        win: "Player %d wins!",
-        draw: "Draw!"
-    }
-};
-
-// Состояние игры
-let state = {
-    board: Array(9).fill(null), // null или { player: 1|2, size: 1-5 }
-    currentPlayer: 1,
-    pieces: { 1: [1, 2, 3, 4, 5], 2: [1, 2, 3, 4, 5] },
-    lang: "ru"
-};
-
-// Получение пути к SVG
-function getSvgPath(player, size) {
-    const color = player === 1 ? 'black' : 'purple';
-    return `svg/${color}_${size}.svg`;
+:root {
+  --bg: #111;
+  --panel: #1b1b1b;
+  --text: #eaeaea;
+  --muted: #a7a7a7;
+  --primary: #6a5acd; /* slateblue */
+  --accent: #444;
+  --border: #2a2a2a;
 }
 
-// Инициализация
-document.addEventListener("DOMContentLoaded", () => {
-    // Гарантируем, что модальное окно скрыто
-    document.getElementById("rules-modal").classList.add("hidden");
-
-    // Привязка событий
-    document.getElementById("start-game-btn").addEventListener("click", startGame);
-    document.getElementById("back-to-menu").addEventListener("click", backToMenu);
-    document.getElementById("rules-btn").addEventListener("click", showRules);
-    document.getElementById("close-modal").addEventListener("click", hideRules);
-    document.getElementById("rules-modal").addEventListener("click", (e) => {
-        if (e.target === e.currentTarget) hideRules();
-    });
-    document.getElementById("language-switcher").addEventListener("change", (e) => {
-        state.lang = e.target.value;
-        updateUI();
-    });
-
-    // Инициализация UI
-    updateUI();
-
-    // Telegram Web App
-    if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-    }
-});
-
-// Запуск игры
-function startGame() {
-    document.getElementById("main-menu").classList.add("hidden");
-    document.getElementById("game-container").classList.remove("hidden");
-    document.getElementById("game-container").classList.add("show");
-    initBoard();
-    updateUI();
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background: linear-gradient(180deg, #0d0d0d, #151515);
 }
 
-// Возврат в меню
-function backToMenu() {
-    document.getElementById("main-menu").classList.remove("hidden");
-    document.getElementById("game-container").classList.remove("show");
-    document.getElementById("game-container").classList.add("hidden");
+button, select { font: inherit; }
+button {
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform .05s ease;
 }
+button:hover { transform: translateY(-1px); }
+button.secondary { background: var(--accent); color: var(--text); }
+button:disabled { opacity: .6; cursor: not-allowed; }
 
-// Создание игрового поля
-function initBoard() {
-    const board = document.getElementById("game-board");
-    board.innerHTML = "";
-    for (let i = 0; i < 9; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.dataset.index = i;
-        cell.addEventListener("click", handleCellClick);
-        board.appendChild(cell);
-    }
+.menu {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
 }
+.menu h1 { margin: 0 0 10px; font-size: 48px; }
+#language-switcher { background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 10px; }
 
-// Обновление интерфейса
-function updateUI() {
-    const lang = translations[state.lang];
-    document.title = lang.title;
-    document.querySelectorAll("h1").forEach(h1 => h1.textContent = lang.title);
-    document.getElementById("rules-btn").textContent = lang.rulesBtn;
-    document.getElementById("current-player").textContent = lang.currentPlayer + state.currentPlayer;
-    document.getElementById("rules-title").textContent = lang.rulesTitle;
-    document.getElementById("rules-text").textContent = lang.rules;
-    updatePieces();
+.hidden { display: none !important; }
+.show { animation: fadeIn .2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,.3); backdrop-filter: blur(6px);
 }
+.topbar h1 { margin: 0; font-size: 28px; }
+.topbar-actions { display: flex; gap: 8px; }
 
-// Отображение доступных фигур
-function updatePieces() {
-    const piecesDiv = document.getElementById("player-pieces");
-    piecesDiv.innerHTML = "";
-    state.pieces[state.currentPlayer].forEach(size => {
-        const img = document.createElement("img");
-        img.src = getSvgPath(state.currentPlayer, size);
-        img.alt = "Matryoshka";
-        img.classList.add("piece-img");
-        img.dataset.size = size;
-        img.addEventListener("click", (e) => {
-            document.querySelectorAll(".piece-img").forEach(p => p.classList.remove("selected"));
-            e.target.classList.add("selected");
-            selectPiece(size);
-        });
-        piecesDiv.appendChild(img);
-    });
+.layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; padding: 16px; }
+@media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 520px;
+  margin: 0 auto;
 }
-
-// Выбор фигуры
-let selectedPiece = null;
-function selectPiece(size) {
-    selectedPiece = size;
+.cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: grid; place-items: center;
+  overflow: hidden;
 }
+.board-piece { width: 68%; height: auto; pointer-events: none; }
 
-// Обработка клика по ячейке
-function handleCellClick(e) {
-    if (!selectedPiece) return;
-    const index = e.target.dataset.index;
-    const current = state.board[index];
-
-    if (!current || current.size < selectedPiece) {
-        state.board[index] = { player: state.currentPlayer, size: selectedPiece };
-        state.pieces[state.currentPlayer] = state.pieces[state.currentPlayer].filter(s => s !== selectedPiece);
-        const img = document.createElement("img");
-        img.src = getSvgPath(state.currentPlayer, selectedPiece);
-        img.alt = "Matryoshka";
-        img.classList.add("board-piece", "placed");
-        e.target.innerHTML = "";
-        e.target.appendChild(img);
-        selectedPiece = null;
-        checkWin();
-        state.currentPlayer = state.currentPlayer === 1 ? 2 : 1;
-        updateUI();
-    }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
 }
-
-// Проверка победы
-function checkWin() {
-    const lines = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Горизонтали
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Вертикали
-        [0, 4, 8], [2, 4, 6]             // Диагонали
-    ];
-    for (let line of lines) {
-        const [a, b, c] = line;
-        if (state.board[a] && state.board[b] && state.board[c] &&
-            state.board[a].player === state.board[b].player &&
-            state.board[b].player === state.board[c].player) {
-            alert(translations[state.lang].win.replace("%d", state.board[a].player));
-            resetGame();
-            return;
-        }
-    }
-    if (state.pieces[1].length === 0 && state.pieces[2].length === 0) {
-        alert(translations[state.lang].draw);
-        resetGame();
-    }
+#current-player { margin: 0 0 8px; color: var(--muted); }
+.pieces { display: grid; grid-template-columns: repeat(5, minmax(40px,1fr)); gap: 10px; }
+.piece-img {
+  width: 100%; height: auto; background: #0000;
+  border: 2px solid transparent;
+  border-radius: 12px; cursor: pointer;
+  transition: border-color .15s ease, transform .05s ease;
 }
+.piece-img:hover { transform: translateY(-1px); }
+.piece-img.selected { border-color: var(--primary); }
+.piece-img.disabled { opacity: .35; cursor: not-allowed; }
 
-// Сброс игры
-function resetGame() {
-    state.board = Array(9).fill(null);
-    state.currentPlayer = 1;
-    state.pieces = { 1: [1, 2, 3, 4, 5], 2: [1, 2, 3, 4, 5] };
-    initBoard();
-    updateUI();
+/* Modal */
+.modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); }
+.modal .modal-content {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  max-width: 640px;
 }
+.close { background: transparent; color: var(--text); border: 0; font-size: 22px; padding: 4px 8px; float: right; }
 
-// Модальное окно
-function showRules() {
-    document.getElementById("rules-modal").classList.remove("hidden");
-}
-
-function hideRules() {
-    document.getElementById("rules-modal").classList.add("hidden");
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
