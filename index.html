@@ -1,42 +1,49 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Матрёшки</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Матрёшки</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="main-menu" class="menu">
-        <h1>Матрёшки</h1>
-        <button id="start-game-btn">Начать</button>
-        <button id="rules-btn">Правила</button>
-        <select id="language-switcher">
-            <option value="ru">RU</option>
-            <option value="en">EN</option>
-        </select>
+  <div id="main-menu" class="menu">
+    <h1 id="title-text">Матрёшки</h1>
+    <button id="start-game-btn">Начать</button>
+    <button id="rules-btn">Правила</button>
+    <select id="language-switcher" aria-label="Язык">
+      <option value="ru">RU</option>
+      <option value="en">EN</option>
+    </select>
+  </div>
+
+  <div id="game-container" class="hidden">
+    <header class="topbar">
+      <h1 id="header-title">Матрёшки</h1>
+      <div class="topbar-actions">
+        <button id="undo-btn" class="secondary">Отменить ход</button>
+        <button id="reset-btn" class="secondary">Сброс</button>
+        <button id="back-to-menu">Назад</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div id="game-board" class="board" aria-label="Игровое поле" role="grid" aria-rowcount="3" aria-colcount="3"></div>
+      <aside id="controls" class="panel">
+        <p id="current-player" aria-live="polite">Игрок: 1</p>
+        <div id="player-pieces" class="pieces" aria-label="Фишки игрока"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="rules-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+    <div class="modal-content">
+      <button id="close-modal" class="close" aria-label="Закрыть">×</button>
+      <h2 id="rules-title">Правила</h2>
+      <p id="rules-text"></p>
     </div>
-    <div id="game-container" class="hidden">
-        <header>
-            <h1>Матрёшки</h1>
-            <button id="back-to-menu">Назад</button>
-        </header>
-        <main>
-            <div id="game-board"></div>
-            <div id="controls">
-                <p id="current-player">Игрок: 1</p>
-                <div id="player-pieces"></div>
-            </div>
-        </main>
-    </div>
-    <div id="rules-modal" class="modal hidden">
-        <div class="modal-content">
-            <span id="close-modal">×</span>
-            <h2 id="rules-title">Правила</h2>
-            <p id="rules-text"></p>
-        </div>
-    </div>
+  </div>
 </body>
 </html>
