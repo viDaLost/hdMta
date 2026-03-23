@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Космический Атлас</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040814;
+  --bg2:#081022;
+  --panel:rgba(10,16,36,.72);
+  --panel-strong:rgba(8,13,28,.88);
+  --stroke:rgba(162,212,255,.12);
+  --stroke-2:rgba(255,255,255,.08);
+  --text:#eef7ff;
+  --muted:#92a6c8;
+  --cyan:#77ebff;
+  --blue:#6b89ff;
+  --violet:#9278ff;
+  --pink:#ff70d6;
+  --gold:#ffd891;
+  --shadow:0 18px 48px rgba(0,0,0,.34);
+  --radius:24px;
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;}
+body{
+  font-family:'Exo 2',sans-serif;
+  min-height:100vh;
+  color:var(--text);
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 18% 18%,rgba(78,42,175,.18),transparent 22%),
+    radial-gradient(circle at 82% 16%,rgba(0,166,255,.10),transparent 18%),
+    radial-gradient(circle at 50% 95%,rgba(201,75,255,.06),transparent 22%),
+    linear-gradient(180deg,#030612 0%,#060b18 50%,#040814 100%);
+}
+body.solar-lock{overflow:hidden;}
+
+.app-stars,
+.app-nebula,
+.app-nebula-2,
+.app-glow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+.app-stars{z-index:0;overflow:hidden;}
+.app-nebula{
+  z-index:0;
+  background:
+    radial-gradient(circle at 20% 25%,rgba(111,76,255,.11),transparent 22%),
+    radial-gradient(circle at 70% 30%,rgba(0,170,255,.08),transparent 18%),
+    radial-gradient(circle at 58% 78%,rgba(255,75,172,.05),transparent 20%);
+  filter:blur(22px);
+  animation:nebulaFloat 24s ease-in-out infinite alternate;
+}
+.app-nebula-2{
+  z-index:0;
+  background:
+    radial-gradient(circle at 78% 18%,rgba(120,70,255,.07),transparent 18%),
+    radial-gradient(circle at 18% 70%,rgba(0,214,255,.05),transparent 18%),
+    radial-gradient(circle at 54% 46%,rgba(255,180,70,.03),transparent 14%);
+  filter:blur(38px);
+  animation:nebulaFloat2 30s ease-in-out infinite alternate;
+}
+.app-glow{
+  z-index:0;
+  background:radial-gradient(circle at center, rgba(255,255,255,.025), transparent 42%);
+  animation:glowPulse 10s ease-in-out infinite;
+}
+@keyframes nebulaFloat{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  100%{transform:translate3d(-2%,1.5%,0) scale(1.08);}
+}
+@keyframes nebulaFloat2{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  100%{transform:translate3d(2%,-1.5%,0) scale(1.10);}
+}
+@keyframes glowPulse{
+  0%,100%{opacity:.55;}
+  50%{opacity:1;}
+}
+.star{
+  position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,rgba(255,255,255,.78) 45%,rgba(255,255,255,0) 100%);
+  animation:twinkle 4s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:.18;transform:scale(.9);}
+  50%{opacity:1;transform:scale(1.18);}
+}
+
+.glass{
+  background:linear-gradient(180deg,rgba(13,21,44,.72),rgba(8,13,25,.72));
+  border:1px solid var(--stroke);
+  box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.main-menu{
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.menu-shell{
+  width:min(980px,100%);
+  border-radius:32px;
+  padding:28px;
+  position:relative;
+  overflow:hidden;
+}
+.menu-shell::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 10% 16%,rgba(122,98,255,.16),transparent 18%),
+    radial-gradient(circle at 88% 22%,rgba(0,213,255,.10),transparent 16%),
+    radial-gradient(circle at 50% 100%,rgba(255,110,208,.06),transparent 20%);
+  pointer-events:none;
+}
+.hero{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:20px;
+}
+.hero-head{
+  border-radius:28px;
+  padding:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+}
+.app-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:#ccecff;
+  font-size:.78rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.hero-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(2rem,5vw,4rem);
+  line-height:1.02;
+  margin-bottom:14px;
+  background:linear-gradient(90deg,#fff,#9fe7ff 40%,#a98cff 72%,#ffd1ef 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-text{
+  color:var(--muted);
+  font-size:1.05rem;
+  line-height:1.65;
+  max-width:760px;
+}
+.menu-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.nav-card{
+  position:relative;
+  padding:22px 20px;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.10);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03)),
+    radial-gradient(circle at top right,rgba(108,236,255,.08),transparent 26%);
+  color:#fff;
+  cursor:pointer;
+  transition:.32s ease;
+  text-align:left;
+  overflow:hidden;
+}
+.nav-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.08),transparent);
+  transform:translateX(-120%);
+  transition:transform .7s ease;
+}
+.nav-card:hover::before{transform:translateX(120%);}
+.nav-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(108,236,255,.22);
+  box-shadow:0 18px 34px rgba(0,0,0,.28);
+}
+.nav-icon{
+  width:58px;height:58px;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;
+  background:linear-gradient(135deg,rgba(108,236,255,.14),rgba(138,107,255,.12));
+  border:1px solid rgba(255,255,255,.08);
+  margin-bottom:14px;
+}
+.nav-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.12rem;
+  margin-bottom:8px;
+}
+.nav-desc{
+  color:var(--muted);
+  line-height:1.5;
+  font-size:.95rem;
+}
+
+.section{
+  display:none;
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+}
+.section.active{display:block;}
+
+.page-wrap{
+  width:min(1280px,calc(100% - 28px));
+  margin:0 auto;
+  padding:18px 0 26px;
+}
+.page-topbar{
+  position:sticky;
+  top:12px;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  margin-bottom:18px;
+  border-radius:24px;
+}
+.brand-chip{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(108,236,255,.18),rgba(138,107,255,.15));
+  border:1px solid rgba(255,255,255,.08);
+  font-size:1.2rem;
+}
+.brand-text b{
+  display:block;
+  font-family:'Orbitron',sans-serif;
+  font-size:.95rem;
+  white-space:nowrap;
+}
+.brand-text span{
+  display:block;
+  font-size:.83rem;
+  color:var(--muted);
+}
+.icon-btn{
+  width:46px;height:46px;border-radius:15px;
+  border:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.05));
+  color:#fff;
+  cursor:pointer;
+  transition:.25s ease;
+}
+.icon-btn:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.07));
+}
+
+.section-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(1.5rem,3vw,2.2rem);
+  margin-bottom:10px;
+}
+.section-subtitle{
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:22px;
+  max-width:760px;
+}
+
+.planets-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:16px;
+}
+.planet-card{
+  position:relative;
+  padding:18px;
+  border-radius:24px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:.32s ease;
+}
+.planet-card::before{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at top right,rgba(108,236,255,.08),transparent 26%),
+    radial-gradient(circle at bottom left,rgba(138,107,255,.08),transparent 20%);
+  pointer-events:none;
+}
+.planet-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(108,236,255,.18);
+  box-shadow:0 24px 40px rgba(0,0,0,.28);
+}
+.planet-visual{
+  width:128px; height:128px; margin:0 auto 16px; border-radius:50%; position:relative;
+  box-shadow: inset -24px -24px 40px rgba(0,0,0,.7), inset 8px 8px 16px rgba(255,255,255,.25), 0 0 28px rgba(255,255,255,.05);
+  overflow: visible;
+}
+.mercury {background: radial-gradient(circle at 35% 35%, #e1e4e8 0%, #a2a7b0 35%, #585e68 70%, #2a2e35 100%);}
+.venus {background: radial-gradient(circle at 35% 35%, #ffebad 0%, #e8aa4c 40%, #a46d24 75%, #59390f 100%);}
+.earth {background: radial-gradient(circle at 35% 35%, #88d7ff 0%, #358be8 35%, #145094 70%, #062145 100%);}
+.mars {background: radial-gradient(circle at 35% 35%, #ffa685 0%, #d85736 35%, #8c2a17 70%, #3d0d08 100%);}
+.jupiter {background: linear-gradient(160deg, #e6c59a 0%, #d2a16b 20%, #f0d0a7 36%, #b87c48 52%, #e3ba88 70%, #684830 100%);}
+.saturn {background: radial-gradient(circle at 35% 35%, #fceac2 0%, #dbba78 40%, #a68444 75%, #5e471d 100%);}
+.uranus {background: radial-gradient(circle at 35% 35%, #e6fcff 0%, #90e0f0 40%, #368d9e 75%, #154552 100%);}
+.neptune {background: radial-gradient(circle at 35% 35%, #aebfff 0%, #5678f5 40%, #1c369e 75%, #08154f 100%);}
+
+.jupiter::after{
+  content:'';
+  position:absolute;width:36px;height:22px;border-radius:50%;
+  background:rgba(136,69,43,.7);left:28%;top:44%;
+  box-shadow:0 0 10px rgba(136,69,43,.45);
+}
+.saturn::before{
+  content:''; position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) rotateX(72deg);
+  width: 210px; height: 65px; border-radius: 50%;
+  border: 14px solid rgba(243,216,147,.45);
+  border-top-color: rgba(243,216,147,.15);
+  box-shadow: 0 0 24px rgba(243,216,147,.25), inset 0 0 12px rgba(243,216,147,.2);
+}
+.planet-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.28rem;
+  text-align:center;
+  margin-bottom:6px;
+}
+.planet-tagline{
+  text-align:center;
+  color:var(--muted);
+  font-size:.92rem;
+  margin-bottom:14px;
+}
+.planet-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.stat{
+  border-radius:16px;
+  padding:12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.05);
+  text-align:center;
+}
+.stat-label{
+  font-size:.66rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#7183a5;
+  margin-bottom:4px;
+}
+.stat-value{
+  color:#dff8ff;
+  font-weight:600;
+  font-size:.9rem;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  padding:18px;
+  background:rgba(1,4,12,.84);
+  backdrop-filter:blur(10px);
+}
+.modal.open{display:flex;align-items:center;justify-content:center;}
+.modal-content{
+  width:min(760px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:26px;
+  border-radius:28px;
+  position:relative;
+}
+.modal-close{
+  position:absolute;
+  right:14px; top:14px;
+  width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+  color:#fff;cursor:pointer;
+}
+.modal-head{
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:18px;
+  align-items:center;
+}
+.modal-planet-visual{
+  width:180px;height:180px;border-radius:50%;
+  box-shadow:inset -24px -24px 40px rgba(0,0,0,.7), inset 8px 8px 16px rgba(255,255,255,.25), 0 0 28px rgba(255,255,255,.05);
+  margin:auto;
+}
+.modal-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:2rem;
+  margin-bottom:6px;
+}
+.modal-subtitle{
+  color:var(--muted);
+  margin-bottom:18px;
+  line-height:1.5;
+}
+.modal-stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:20px;
+}
+.modal-stat{
+  border-radius:16px;
+  padding:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  text-align:center;
+}
+.modal-stat-val{
+  color:#dff8ff;
+  font-weight:700;
+  font-size:1.06rem;
+}
+.modal-stat-lbl{
+  color:#7f90af;
+  font-size:.72rem;
+  text-transform:uppercase;
+  margin-top:6px;
+}
+.facts-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:1rem;
+  color:var(--cyan);
+  margin:22px 0 12px;
+}
+.facts-list{
+  list-style:none;
+  display:grid;
+  gap:10px;
+}
+.facts-list li{
+  padding:14px 14px 14px 16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.05);
+  border-left:3px solid rgba(108,236,255,.5);
+  color:#d7e6ff;
+  line-height:1.55;
+}
+
+.solar-section{
+  padding:8px 0;
+}
+.solar-stage{
+  position:relative;
+  width:min(1280px,calc(100% - 16px));
+  margin:0 auto;
+  height:calc(100svh - 16px);
+  border-radius:28px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 24px 60px rgba(0,0,0,.36);
+  background:radial-gradient(circle at center,#0b1427 0%,#040914 70%,#02050c 100%);
+}
+#solarCanvas{
+  width:100%;
+  height:100%;
+  display:block;
+  cursor:grab;
+  touch-action:none;
+}
+#solarCanvas:active{cursor:grabbing;}
+
+.solar-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.solar-overlay > *{pointer-events:auto;}
+
+.solar-back-btn{
+  position:absolute;
+  left:16px;
+  top:calc(16px + var(--safe-top));
+  z-index:24;
+}
+.clean-screen-btn{
+  position:absolute;
+  right:16px;
+  top:calc(16px + var(--safe-top));
+  z-index:25;
+}
+.clean-screen-btn,
+.solar-back-btn{
+  height:48px;
+  padding:0 16px;
+  border:none;
+  border-radius:16px;
+  color:#fff;
+  cursor:pointer;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.05)),
+    radial-gradient(circle at top right,rgba(108,236,255,.08),transparent 30%);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 12px 28px rgba(0,0,0,.24);
+  transition:.25s ease;
+}
+.clean-screen-btn:hover,
+.solar-back-btn:hover{transform:translateY(-2px);}
+
+.solar-title-chip{
+  position:absolute;
+  left:50%;
+  top:calc(16px + var(--safe-top));
+  transform:translateX(-50%);
+  z-index:24;
+  padding:12px 16px;
+  border-radius:18px;
+  min-width:min(90vw,430px);
+  text-align:center;
+}
+.solar-title-chip b{
+  display:block;
+  font-family:'Orbitron',sans-serif;
+  font-size:.95rem;
+  margin-bottom:4px;
+}
+.solar-title-chip span{
+  display:block;
+  color:var(--muted);
+  font-size:.83rem;
+}
+
+.solar-info{
+  position:absolute;
+  left:50%;
+  bottom:108px;
+  transform:translateX(-50%);
+  z-index:24;
+  min-width:min(92vw,400px);
+  max-width:min(92vw,520px);
+  border-radius:22px;
+  padding:14px 16px;
+  text-align:center;
+}
+.solar-info b{
+  display:block;
+  font-family:'Orbitron',sans-serif;
+  margin-bottom:6px;
+  color:#c8f5ff;
+}
+.solar-info span{
+  color:#d5e9ff;
+  font-size:.92rem;
+  line-height:1.5;
+}
+.solar-info small{
+  display:block;
+  color:#8aa0c4;
+  margin-top:8px;
+  line-height:1.45;
+}
+
+.controls-dock{
+  position:absolute;
+  left:50%;
+  bottom:calc(16px + var(--safe-bottom));
+  transform:translateX(-50%);
+  z-index:24;
+  width:min(760px,calc(100% - 22px));
+  padding:10px;
+  border-radius:24px;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.control-btn{
+  min-height:58px;
+  border:none;
+  border-radius:18px;
+  color:#eff9ff;
+  cursor:pointer;
+  font-family:'Exo 2',sans-serif;
+  font-weight:700;
+  font-size:1rem;
+  line-height:1.1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04)),
+    radial-gradient(circle at top right,rgba(108,236,255,.06),transparent 30%);
+  border:1px solid rgba(255,255,255,.10);
+  transition:.25s ease;
+}
+.control-btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(108,236,255,.20);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06)),
+    radial-gradient(circle at top right,rgba(108,236,255,.10),transparent 30%);
+}
+.control-btn .icon{
+  font-size:1.15rem;
+}
+.control-btn .label{
+  font-size:.98rem;
+  white-space:nowrap;
+}
+.solar-ui-hideable{
+  transition:opacity .25s ease, transform .25s ease;
+}
+.solar-section.ui-minimal .solar-ui-hideable{
+  opacity:0;
+  transform:translateY(10px) scale(.98);
+  pointer-events:none;
+}
+
+@media (max-width:980px){
+  .modal-head{grid-template-columns:1fr;}
+  .modal-stats-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:760px){
+  .main-menu{padding:12px;}
+  .menu-shell{padding:16px;border-radius:24px;}
+  .hero-head{padding:20px;border-radius:22px;}
+  .menu-grid{grid-template-columns:1fr;}
+  .page-wrap{width:min(calc(100% - 12px),1280px);}
+  .page-topbar{top:8px;}
+  .solar-stage{
+    width:calc(100% - 10px);
+    height:calc(100svh - 10px);
+    border-radius:22px;
+  }
+  .solar-title-chip{
+    display:none;
+  }
+  .solar-info{
+    left:10px;
+    right:10px;
+    transform:none;
+    min-width:0;
+    max-width:none;
+    bottom:146px;
+    padding:13px 14px;
+  }
+  .clean-screen-btn,
+  .solar-back-btn{
+    top:calc(10px + var(--safe-top));
+    height:46px;
+    border-radius:15px;
+  }
+  .clean-screen-btn{
+    right:10px;
+    padding:0 14px;
+    font-size:.92rem;
+  }
+  .solar-back-btn{
+    left:10px;
+    min-width:46px;
+    padding:0 14px;
+  }
+  .planets-container {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+    gap: 12px;
+  }
+  .planet-visual { width: 96px; height: 96px; margin-bottom: 12px; }
+  .planet-name { font-size: 1.1rem; }
+  .planet-stats { display: flex; flex-direction: column; gap: 6px; }
+  .stat { padding: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .stat-label { margin-bottom: 0; font-size: 0.6rem; }
+  .stat-value { font-size: 0.8rem; }
+  .modal-head { grid-template-columns: 1fr; text-align: center; }
+  .modal-planet-visual { width: 140px; height: 140px; margin-bottom: 16px; }
+  .modal-content { padding: 20px 16px; }
+}
+@media (max-width:540px){
+  .modal-stats-grid{grid-template-columns:1fr;}
+  .planet-stats{grid-template-columns:1fr 1fr;}
+  .brand-text span{display:none;}
+  .hero-title { font-size: 2.2rem; }
+  .controls-dock{
+    width:calc(100% - 12px);
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+    padding:6px;
+    bottom:calc(10px + var(--safe-bottom));
+  }
+  .control-btn.reset{
+    grid-column:1 / -1;
+  }
+  .control-btn { min-height: 48px; border-radius: 12px; font-size:.96rem; }
+  .control-btn .icon { font-size: 1rem; }
+  .control-btn .label{font-size:.92rem;}
+  .solar-info { padding: 10px 12px; bottom: 130px; }
+  .solar-info span { font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-stars" id="appStars"></div>
+<div class="app-nebula"></div>
+<div class="app-nebula-2"></div>
+<div class="app-glow"></div>
+
+<div class="main-menu" id="mainMenu">
+  <div class="menu-shell glass">
+    <div class="hero">
+      <div class="hero-head">
+        <div class="app-badge">✨ COSMIC ATLAS</div>
+        <h1 class="hero-title">Космический Атлас</h1>
+        <p class="hero-text">
+          Мобильная интерактивная энциклопедия о Солнечной системе.
+          Открывай карточки планет и переходи в плавную 3D-сцену с живым космосом,
+          улучшенными моделями и удобным управлением для телефона.
+        </p>
+      </div>
+
+      <div class="menu-grid">
+        <button class="nav-card" onclick="showSection('planets')">
+          <div class="nav-icon">🪐</div>
+          <div class="nav-title">Планеты</div>
+          <div class="nav-desc">Красивые карточки с параметрами, описанием и фактами по каждой планете.</div>
+        </button>
+
+        <button class="nav-card" onclick="showSection('solar')">
+          <div class="nav-icon">☀️</div>
+          <div class="nav-title">Солнечная система 3D</div>
+          <div class="nav-desc">Плавная 3D-сцена с улучшенными моделями, живым фоном и удобным управлением камерой.</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="section" id="planets">
+  <div class="page-wrap">
+    <div class="page-topbar glass">
+      <div class="brand-chip">
+        <div class="brand-mark">🪐</div>
+        <div class="brand-text">
+          <b>Планеты Солнечной системы</b>
+          <span>Красивые карточки и факты</span>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="goBack()" title="Назад">←</button>
+    </div>
+
+    <h2 class="section-title">Планеты</h2>
+    <p class="section-subtitle">
+      Нажми на любую планету, чтобы открыть расширенную карточку с её основными параметрами и интересными фактами.
+    </p>
+
+    <div class="planets-container" id="planetsGrid"></div>
+  </div>
+</section>
+
+<section class="section solar-section" id="solar">
+  <div class="solar-stage glass">
+    <canvas id="solarCanvas"></canvas>
+
+    <div class="solar-overlay">
+      <button class="solar-back-btn solar-ui-hideable" onclick="goBack()" title="Назад">←</button>
+
+      <div class="solar-title-chip glass solar-ui-hideable">
+        <b>Солнечная система 3D</b>
+        <span>Перетаскивай сцену, приближай и меняй угол обзора</span>
+      </div>
+
+      <button class="clean-screen-btn" id="cleanScreenBtn" onclick="toggleCleanScreen()">🫥 Чистый экран</button>
+
+      <div class="solar-info glass solar-ui-hideable" id="solarInfo">
+        <b>Наведи или тапни на планету</b>
+        <span>Потяни сцену пальцем, чтобы смещать камеру. Щипок меняет масштаб.</span>
+        <small>Кнопки внизу управляют масштабом и углом обзора.</small>
+      </div>
+
+      <div class="controls-dock glass solar-ui-hideable">
+        <button class="control-btn" onclick="adjustZoom(-0.18)">
+          <span class="icon">➖</span>
+          <span class="label">Масштаб</span>
+        </button>
+        <button class="control-btn" onclick="adjustZoom(0.18)">
+          <span class="icon">➕</span>
+          <span class="label">Масштаб</span>
+        </button>
+        <button class="control-btn" onclick="adjustTilt(-0.08)">
+          <span class="icon">⬇️</span>
+          <span class="label">Угол</span>
+        </button>
+        <button class="control-btn" onclick="adjustTilt(0.08)">
+          <span class="icon">⬆️</span>
+          <span class="label">Угол</span>
+        </button>
+        <button class="control-btn reset" onclick="resetCamera()">
+          <span class="icon">🔄</span>
+          <span class="label">Сброс вида</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="modal">
+  <div class="modal-content glass">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-head">
+      <div class="modal-planet-visual" id="modalVisual"></div>
+      <div>
+        <h2 class="modal-name" id="modalName"></h2>
+        <p class="modal-subtitle" id="modalSubtitle"></p>
+      </div>
+    </div>
+
+    <div class="modal-stats-grid" id="modalStats"></div>
+
+    <div class="facts-title">🔭 Интересные факты</div>
+    <ul class="facts-list" id="modalFacts"></ul>
+  </div>
+</div>
+
+<script>
+const PLANETS = [
+  {
+    id:'mercury', name:'Меркурий', cssClass:'mercury',
+    tagline:'Самая маленькая планета',
+    stats:{distance:'57.9 млн км', period:'88 суток', moons:'0', diameter:'4 879 км', temp:'-173 / +427°C', mass:'3.3×10²³ кг'},
+    facts:[
+      'Меркурий — ближайшая к Солнцу планета, но не самая горячая.',
+      'Почти не имеет плотной атмосферы, поэтому температура там резко меняется.',
+      'Его поверхность покрыта множеством кратеров, как у Луны.',
+      'Железное ядро у Меркурия занимает очень большую часть его объёма.',
+      'Год на Меркурии проходит всего за 88 земных суток.'
+    ]
+  },
+  {
+    id:'venus', name:'Венера', cssClass:'venus',
+    tagline:'Самая горячая планета',
+    stats:{distance:'108.2 млн км', period:'225 суток', moons:'0', diameter:'12 104 км', temp:'+464°C', mass:'4.87×10²⁴ кг'},
+    facts:[
+      'Венера — самая горячая планета Солнечной системы из-за мощного парникового эффекта.',
+      'Её плотная атмосфера состоит в основном из углекислого газа.',
+      'На Венере Солнце восходит на западе, потому что она вращается в обратную сторону.',
+      'День на Венере длиннее её года.',
+      'По размеру Венера очень близка к Земле.'
+    ]
+  },
+  {
+    id:'earth', name:'Земля', cssClass:'earth',
+    tagline:'Наш дом',
+    stats:{distance:'149.6 млн км', period:'365 суток', moons:'1', diameter:'12 742 км', temp:'-89 / +58°C', mass:'5.97×10²⁴ кг'},
+    facts:[
+      'Земля — единственная известная нам планета, где существует жизнь.',
+      'Около 71% её поверхности покрыто водой.',
+      'Атмосфера и магнитное поле защищают планету от солнечного ветра.',
+      'Луна помогает стабилизировать наклон земной оси.',
+      'На Земле есть вода сразу в трёх состояниях: жидком, твёрдом и газообразном.'
+    ]
+  },
+  {
+    id:'mars', name:'Марс', cssClass:'mars',
+    tagline:'Красная планета',
+    stats:{distance:'227.9 млн км', period:'687 суток', moons:'2', diameter:'6 779 км', temp:'-125 / +20°C', mass:'6.39×10²³ кг'},
+    facts:[
+      'Красный оттенок Марса связан с оксидом железа на поверхности.',
+      'На Марсе находится Олимп — крупнейший вулкан Солнечной системы.',
+      'У планеты есть два маленьких спутника: Фобос и Деймос.',
+      'День на Марсе длится примерно 24 часа 37 минут.',
+      'На Марсе найдены признаки древних русел и следов прошлой воды.'
+    ]
+  },
+  {
+    id:'jupiter', name:'Юпитер', cssClass:'jupiter',
+    tagline:'Самая большая планета',
+    stats:{distance:'778.5 млн км', period:'11.9 лет', moons:'95', diameter:'139 820 км', temp:'-110°C', mass:'1.9×10²⁷ кг'},
+    facts:[
+      'Юпитер — крупнейшая планета Солнечной системы.',
+      'Его Большое красное пятно — это гигантский шторм.',
+      'Юпитер состоит в основном из водорода и гелия.',
+      'У него очень мощное магнитное поле.',
+      'Юпитер помогает притягивать и отклонять часть астероидов и комет.'
+    ]
+  },
+  {
+    id:'saturn', name:'Сатурн', cssClass:'saturn',
+    tagline:'Планета с кольцами',
+    stats:{distance:'1.43 млрд км', period:'29.5 лет', moons:'146', diameter:'116 460 км', temp:'-140°C', mass:'5.68×10²⁶ кг'},
+    facts:[
+      'Сатурн известен своими огромными и очень красивыми кольцами.',
+      'Кольца состоят в основном из льда, пыли и каменных частиц.',
+      'Сатурн очень малоплотный — теоретически он мог бы плавать в воде.',
+      'У него огромное количество спутников, включая Титан.',
+      'На Сатурне дуют очень быстрые ветры.'
+    ]
+  },
+  {
+    id:'uranus', name:'Уран', cssClass:'uranus',
+    tagline:'Ледяной гигант',
+    stats:{distance:'2.87 млрд км', period:'84 года', moons:'27', diameter:'50 724 км', temp:'-195°C', mass:'8.68×10²⁵ кг'},
+    facts:[
+      'Уран вращается почти лежа на боку.',
+      'Из-за сильного наклона оси сезоны там длятся очень долго.',
+      'Он относится к ледяным гигантам.',
+      'У Урана есть тонкие кольца.',
+      'Это первая планета, открытая при помощи телескопа.'
+    ]
+  },
+  {
+    id:'neptune', name:'Нептун', cssClass:'neptune',
+    tagline:'Самая дальняя планета',
+    stats:{distance:'4.5 млрд км', period:'165 лет', moons:'16', diameter:'49 244 км', temp:'-200°C', mass:'1.02×10²⁶ кг'},
+    facts:[
+      'Нептун — самая дальняя планета от Солнца.',
+      'На нём наблюдаются одни из самых сильных ветров в Солнечной системе.',
+      'Он был сначала вычислен математически, а уже потом найден в телескоп.',
+      'Крупнейший спутник Нептуна — Тритон.',
+      'В атмосфере Нептуна происходят гигантские штормы.'
+    ]
+  }
+];
+
+const SOLAR_DATA = [
+  {id:'mercury', name:'Меркурий', r:4.7, dist:72,  period:8,  rotation:.55, info:'Ближайшая к Солнцу каменистая планета с древней кратерированной поверхностью.'},
+  {id:'venus',   name:'Венера',   r:8.7, dist:115, period:12, rotation:.18, info:'Покрыта плотными слоями облаков и раскалённой атмосферой из CO₂.'},
+  {id:'earth',   name:'Земля',    r:10.1, dist:162, period:16, rotation:.75, info:'Голубая планета с океанами, континентами, облаками и тонким атмосферным свечением.'},
+  {id:'mars',    name:'Марс',     r:6.6, dist:212, period:20, rotation:.48, info:'Пустынная красная планета с полярными шапками и контрастными тёмными регионами.'},
+  {id:'jupiter', name:'Юпитер',   r:24,  dist:300, period:30, rotation:1.1, info:'Газовый гигант с мощными облачными поясами и знаменитым Большим красным пятном.'},
+  {id:'saturn',  name:'Сатурн',   r:19.6,dist:395, period:40, rotation:.92, info:'Бледно-золотой газовый гигант с крупной системой тонких ледяных колец.', rings:true},
+  {id:'uranus',  name:'Уран',     r:13.8,dist:488, period:50, rotation:.58, info:'Ледяной гигант с мягким циановым оттенком и едва заметными атмосферными полосами.'},
+  {id:'neptune', name:'Нептун',   r:13.0,dist:575, period:60, rotation:.64, info:'Глубоко-синяя планета с яркими облаками и тёмными штормовыми системами.'}
+];
+
+const MOON_DATA = [
+  {host:'earth', orbit:2.25, size:.28, speed:2.2, color:'#d4dbe6'},
+  {host:'mars', orbit:1.65, size:.12, speed:3.6, color:'#b6a48d'},
+  {host:'mars', orbit:2.02, size:.10, speed:2.8, color:'#8a7d70'},
+  {host:'jupiter', orbit:1.82, size:.16, speed:1.3, color:'#ddd5c4'},
+  {host:'jupiter', orbit:2.14, size:.22, speed:1.0, color:'#cbbd9f'}
+];
+
+const TAU = Math.PI * 2;
+const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+const rand = (min,max)=>Math.random()*(max-min)+min;
+
+let activeSolar = false;
+let cleanScreen = false;
+
+let camZoom = 1;
+let targetZoom = 1;
+let camTilt = .56;
+let targetTilt = .56;
+
+let panX = 0;
+let panY = 0;
+let targetPanX = 0;
+let targetPanY = 0;
+
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let lastPinchDist = 0;
+
+let solarAngles = SOLAR_DATA.map((_,i)=>i*Math.PI/4);
+
+let planetTextures = {};
+let textureKey = null;
+let qualityProfile = null;
+
+const spriteCache = { stars: {}, clouds: {} };
+
+function initSprites() {
+  const starColors = ['255,255,255','214,229,255','255,222,178','190,215,255'];
+  starColors.forEach(color => {
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, `rgba(${color},1)`);
+    g.addColorStop(.45, `rgba(${color},.18)`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(32, 32, 32, 0, Math.PI*2); ctx.fill();
+    spriteCache.stars[color] = c;
+  });
+
+  const cloudColors = ['99,74,220', '0,182,255', '255,86,186', '255,181,90'];
+  cloudColors.forEach(color => {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 256;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, `rgba(${color}, 0.09)`);
+    g.addColorStop(.55, 'rgba(255,255,255, 0.015)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(128, 128, 128, 0, Math.PI*2); ctx.fill();
+    spriteCache.clouds[color] = c;
+  });
+}
+
+(function generateAppStars(){
+  const c = document.getElementById('appStars');
+  const colors = ['#ffffff','#d7e8ff','#ffd7a8','#aed3ff','#f0f7ff'];
+  for(let i=0;i<240;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size=Math.random()*2.8+.4;
+    const blur=Math.random()*4;
+    const opacity=.18+Math.random()*.8;
+    const color=colors[(Math.random()*colors.length)|0];
+    s.style.cssText=`
+      width:${size}px;height:${size}px;
+      top:${Math.random()*100}%;
+      left:${Math.random()*100}%;
+      opacity:${opacity};
+      animation-delay:${Math.random()*4}s;
+      animation-duration:${2+Math.random()*5}s;
+      filter:blur(${blur<1?0:blur/5}px);
+      background:${color};
+      box-shadow:0 0 ${4+Math.random()*10}px ${color};
+    `;
+    c.appendChild(s);
+  }
+})();
+
+function getQualityProfile(){
+  const mobile = window.innerWidth <= 820;
+  return mobile
+    ? { mobile:true, dprCap:1.65, texW:1800, texH:900, farStars:820, twinkle:36, near:20, dust:12, asteroid:130, clouds:4 }
+    : { mobile:false, dprCap:2.0, texW:2400, texH:1200, farStars:1400, twinkle:70, near:40, dust:20, asteroid:190, clouds:6 };
+}
+
+function showSection(id){
+  document.getElementById('mainMenu').style.display='none';
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.body.classList.toggle('solar-lock', id === 'solar');
+  if(id === 'solar' && !activeSolar){
+    activeSolar = true;
+    initSolar();
+  }
+}
+
+function goBack(){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('mainMenu').style.display='flex';
+  document.body.classList.remove('solar-lock');
+}
+
+function adjustZoom(delta){
+  targetZoom = clamp(targetZoom + delta, .45, 4.2);
+}
+
+function adjustTilt(delta){
+  targetTilt = clamp(targetTilt + delta, .18, .95);
+}
+
+function resetCamera(){
+  targetZoom = 1;
+  targetTilt = .56;
+  targetPanX = 0;
+  targetPanY = 0;
+}
+
+function toggleCleanScreen(){
+  cleanScreen = !cleanScreen;
+  const solar = document.getElementById('solar');
+  const btn = document.getElementById('cleanScreenBtn');
+  solar.classList.toggle('ui-minimal', cleanScreen);
+  btn.textContent = cleanScreen ? '👁 Вернуть UI' : '🫥 Чистый экран';
+}
+
+(function buildCards(){
+  const grid = document.getElementById('planetsGrid');
+  PLANETS.forEach(p=>{
+    const card=document.createElement('div');
+    card.className='planet-card glass';
+    card.onclick=()=>openModal(p);
+
+    const statsHTML = Object.entries({
+      'Расстояние':p.stats.distance,
+      'Год':p.stats.period,
+      'Спутники':p.stats.moons,
+      'Диаметр':p.stats.diameter
+    }).map(([l,v])=>`
+      <div class="stat">
+        <div class="stat-label">${l}</div>
+        <div class="stat-value">${v}</div>
+      </div>
+    `).join('');
+
+    card.innerHTML=`
+      <div class="planet-visual ${p.cssClass}"></div>
+      <div class="planet-name">${p.name}</div>
+      <div class="planet-tagline">${p.tagline}</div>
+      <div class="planet-stats">${statsHTML}</div>
+    `;
+    grid.appendChild(card);
+  });
+})();
+
+function openModal(p){
+  document.getElementById('modalVisual').className='modal-planet-visual '+p.cssClass;
+  document.getElementById('modalName').textContent=p.name;
+  document.getElementById('modalSubtitle').textContent=p.tagline;
+
+  const statKeys={
+    distance:'Расстояние от Солнца',
+    period:'Период обращения',
+    moons:'Спутники',
+    diameter:'Диаметр',
+    temp:'Температура',
+    mass:'Масса'
+  };
+
+  document.getElementById('modalStats').innerHTML = Object.entries(p.stats)
+    .map(([k,v])=>`
+      <div class="modal-stat">
+        <div class="modal-stat-val">${v}</div>
+        <div class="modal-stat-lbl">${statKeys[k] || k}</div>
+      </div>
+    `).join('');
+
+  document.getElementById('modalFacts').innerHTML = p.facts.map(f=>`<li>${f}</li>`).join('');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => {
+  if(e.target === e.currentTarget) closeModal();
+});
+
+function createTextureCanvas(w,h){
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  return c;
+}
+
+function bandGradient(ctx,w,h,stops){
+  const g=ctx.createLinearGradient(0,0,0,h);
+  stops.forEach(([p,c])=>g.addColorStop(p,c));
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,w,h);
+}
+
+function seededNoise(x, y, seed = 0){
+  return (Math.sin(x * 12.9898 + y * 78.233 + seed * 37.719) * 43758.5453123) % 1;
+}
+
+function layeredNoise(x, y, seed = 0){
+  let amp = 1;
+  let freq = 1;
+  let sum = 0;
+  let norm = 0;
+  for(let i=0;i<5;i++){
+    const n = seededNoise(x * freq, y * freq, seed + i * 11.13);
+    sum += amp * n;
+    norm += amp;
+    amp *= 0.5;
+    freq *= 2.03;
+  }
+  return sum / norm;
+}
+
+function fillTextureWithNoise(ctx, w, h, palette, seed, scaleX = 1, scaleY = 1, alpha = 1){
+  const img = ctx.createImageData(w,h);
+  const data = img.data;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const nx = (x / w) * scaleX;
+      const ny = (y / h) * scaleY;
+      const n = layeredNoise(nx, ny, seed);
+      const idx = Math.min(palette.length - 1, Math.floor(n * palette.length));
+      const c = palette[idx];
+      const i = (y * w + x) * 4;
+      data[i] = c[0];
+      data[i+1] = c[1];
+      data[i+2] = c[2];
+      data[i+3] = Math.round(255 * alpha);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function overlayNoiseTint(ctx,w,h,color,alpha,seed,scaleX=8,scaleY=4){
+  ctx.save();
+  const img = ctx.createImageData(w,h);
+  const data = img.data;
+  const rgb = color.match(/\d+/g).map(Number);
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const n = layeredNoise((x/w)*scaleX,(y/h)*scaleY,seed);
+      const v = Math.max(0, Math.min(1, (n - .34) / .66));
+      const a = Math.round(v * alpha * 255);
+      const i = (y * w + x) * 4;
+      data[i] = rgb[0];
+      data[i+1] = rgb[1];
+      data[i+2] = rgb[2];
+      data[i+3] = a;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  ctx.restore();
+}
+
+function addNoiseDots(ctx,w,h,count,colorFn,alpha=.22,minR=.6,maxR=3.4){
+  for(let i=0;i<count;i++){
+    const x=Math.random()*w;
+    const y=Math.random()*h;
+    const r=rand(minR,maxR);
+    ctx.fillStyle=colorFn(i, x, y);
+    ctx.globalAlpha=alpha*(.5+Math.random()*.7);
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+
+function addCraterField(ctx,w,h,count,baseDark='rgba(40,40,48,.30)',rim='rgba(255,255,255,.08)', minR=8, maxR=42){
+  for(let i=0;i<count;i++){
+    const x = Math.random()*w;
+    const y = Math.random()*h;
+    const r = rand(minR,maxR);
+    const g = ctx.createRadialGradient(x-r*.24,y-r*.24,0,x,y,r);
+    g.addColorStop(0,'rgba(255,255,255,.10)');
+    g.addColorStop(.32,baseDark);
+    g.addColorStop(.82,'rgba(0,0,0,.12)');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,TAU);
+    ctx.fill();
+
+    ctx.strokeStyle = rim;
+    ctx.lineWidth = rand(1,2.4);
+    ctx.beginPath();
+    ctx.arc(x-r*.08,y-r*.08,r*.72,0,TAU);
+    ctx.stroke();
+  }
+}
+
+function drawSoftBands(ctx,w,h,bands,amplitude=12,thickness=34){
+  for(let i=0;i<bands.length;i++){
+    ctx.fillStyle = bands[i];
+    const y0 = (i/(bands.length-1))*h;
+    ctx.beginPath();
+    ctx.moveTo(0,y0);
+    for(let x=0;x<=w+8;x+=8){
+      const y = y0 + Math.sin((x*.01) + i*1.4)*amplitude + Math.sin((x*.003)+i)*amplitude*.4;
+      ctx.lineTo(x,y);
+    }
+    for(let x=w;x>=-8;x-=8){
+      const y = y0 + thickness + Math.sin((x*.01) + i*1.4)*amplitude + Math.sin((x*.003)+i)*amplitude*.4;
+      ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawCloudStreaks(ctx,w,h,count,color='rgba(255,255,255,.15)'){
+  for(let i=0;i<count;i++){
+    const x = Math.random()*w;
+    const y = Math.random()*h;
+    const rw = rand(80,260);
+    const rh = rand(16,48);
+    const rot = rand(-.35,.35);
+
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(rot);
+    const g = ctx.createRadialGradient(0,0,0,0,0,rw*.7);
+    g.addColorStop(0,color);
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0,0,rw,rh,0,0,TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawCurvedBands(ctx,w,h,rows,bandHeight,amp,colorFn,lineAlpha=.15){
+  for(let i=0;i<rows;i++){
+    const baseY = (i + 0.5) * (h / rows);
+    ctx.fillStyle = colorFn(i, baseY);
+    ctx.beginPath();
+    ctx.moveTo(-20,baseY);
+    for(let x=-20;x<=w+20;x+=10){
+      const y = baseY + Math.sin(x * 0.007 + i * 1.24) * amp + Math.sin(x * 0.013 + i * .52) * amp * .35;
+      ctx.lineTo(x,y);
+    }
+    for(let x=w+20;x>=-20;x-=10){
+      const y = baseY + bandHeight + Math.sin(x * 0.007 + i * 1.24) * amp + Math.sin(x * 0.013 + i * .52) * amp * .35;
+      ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * (0.45 + Math.random()*0.8)})`;
+    ctx.lineWidth = rand(1,3.2);
+    ctx.beginPath();
+    for(let x=-10;x<=w+10;x+=10){
+      const y = baseY + bandHeight * .52 + Math.sin(x * 0.009 + i * 0.95) * amp * .55;
+      if(x===-10) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawSwirlArcs(ctx,w,h,count,colorA,colorB){
+  for(let i=0;i<count;i++){
+    ctx.strokeStyle = i % 2 ? colorA : colorB;
+    ctx.lineWidth = rand(1, 4);
+    const y = rand(0,h);
+    ctx.beginPath();
+    ctx.moveTo(-30,y);
+    for(let x=-30;x<=w+30;x+=50){
+      const wave1 = Math.sin(x * 0.008 + i * 0.83) * rand(3,18);
+      const wave2 = Math.cos(x * 0.003 + i * 1.43) * rand(2,12);
+      ctx.quadraticCurveTo(x+25, y + wave1, x+50, y + wave2);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawContinent(ctx, points, fillStyle, edge='rgba(0,0,0,.15)'){
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for(let i=1;i<points.length;i++){
+    const p = points[i];
+    const prev = points[i-1];
+    const cx = (prev[0]+p[0])*.5;
+    const cy = (prev[1]+p[1])*.5;
+    ctx.quadraticCurveTo(prev[0], prev[1], cx, cy);
+  }
+  const last = points[points.length-1];
+  const first = points[0];
+  ctx.quadraticCurveTo(last[0], last[1], first[0], first[1]);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = 2.2;
+  ctx.stroke();
+}
+
+function drawPolarCap(ctx, x, y, rx, ry, opacity = .85){
+  const g = ctx.createRadialGradient(x,y,0,x,y,rx*1.4);
+  g.addColorStop(0,`rgba(255,255,255,${opacity})`);
+  g.addColorStop(.55,`rgba(235,242,255,${opacity * .74})`);
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.ellipse(x,y,rx,ry,0,0,TAU);
+  ctx.fill();
+}
+
+function applySpecularRim(ctx,w,h,alpha=.12){
+  const rim = ctx.createLinearGradient(0,0,w,0);
+  rim.addColorStop(0,'rgba(255,255,255,0)');
+  rim.addColorStop(.14,`rgba(255,255,255,${alpha * .6})`);
+  rim.addColorStop(.5,'rgba(255,255,255,0)');
+  rim.addColorStop(.86,`rgba(0,0,0,${alpha * .7})`);
+  rim.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = rim;
+  ctx.fillRect(0,0,w,h);
+}
+
+function addLatitudinalHaze(ctx,w,h,color='rgba(255,255,255,.08)', count=14){
+  for(let i=0;i<count;i++){
+    const y = (i + .5) * h / count;
+    const g = ctx.createLinearGradient(0,y-20,0,y+20);
+    g.addColorStop(0,'rgba(255,255,255,0)');
+    g.addColorStop(.5,color);
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,y-24,w,48);
+  }
+}
+
+function buildPlanetTextures(){
+  qualityProfile = getQualityProfile();
+  const key = `${qualityProfile.texW}x${qualityProfile.texH}`;
+  if(textureKey === key) return;
+  textureKey = key;
+  planetTextures = {};
+
+  const W = qualityProfile.texW;
+  const H = qualityProfile.texH;
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    fillTextureWithNoise(ctx,W,H,[
+      [201,206,214],[182,188,197],[157,162,170],[131,137,145],[111,115,124],[82,87,95]
+    ],1.17,11,6,.96);
+    overlayNoiseTint(ctx,W,H,'rgba(228,232,236,1)',.24,2.1,18,9);
+    overlayNoiseTint(ctx,W,H,'rgba(78,83,92,1)',.38,3.4,22,12);
+    addCraterField(ctx,W,H,Math.round(W*.16),'rgba(24,24,30,.36)','rgba(255,255,255,.07)',6,40);
+    addCraterField(ctx,W,H,Math.round(W*.06),'rgba(24,24,30,.18)','rgba(255,255,255,.04)',30,82);
+    drawSwirlArcs(ctx,W,H,28,'rgba(255,255,255,.035)','rgba(50,54,60,.04)');
+    applySpecularRim(ctx,W,H,.08);
+    planetTextures.mercury = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#f6e0b1'],[.18,'#ebbf74'],[.44,'#cb7f32'],[.7,'#a45c1f'],[1,'#7d4519']]);
+    drawCurvedBands(ctx,W,H,28,H*.05,14,(i)=>[
+      'rgba(255,236,195,.22)','rgba(213,152,63,.18)','rgba(255,244,217,.20)','rgba(181,112,36,.15)','rgba(244,205,137,.18)','rgba(156,87,25,.11)'
+    ][i % 6], .08);
+    drawSwirlArcs(ctx,W,H,70,'rgba(255,248,220,.07)','rgba(146,88,22,.07)');
+    addLatitudinalHaze(ctx,W,H,'rgba(255,235,205,.045)',18);
+    drawCloudStreaks(ctx,W,H,Math.round(W*.05),'rgba(255,246,222,.10)');
+    overlayNoiseTint(ctx,W,H,'rgba(255,210,128,1)',.18,5.1,15,10);
+    overlayNoiseTint(ctx,W,H,'rgba(115,56,18,1)',.22,8.4,19,12);
+    applySpecularRim(ctx,W,H,.08);
+    planetTextures.venus = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#7fd7ff'],[.2,'#3f97ef'],[.46,'#1b68b5'],[1,'#06325c']]);
+
+    const landMain = [
+      [[W*.02,H*.27],[W*.08,H*.20],[W*.17,H*.22],[W*.21,H*.32],[W*.18,H*.44],[W*.13,H*.56],[W*.10,H*.66],[W*.05,H*.61],[W*.03,H*.48]],
+      [[W*.20,H*.18],[W*.27,H*.14],[W*.36,H*.18],[W*.41,H*.30],[W*.37,H*.42],[W*.29,H*.46],[W*.23,H*.35]],
+      [[W*.30,H*.51],[W*.36,H*.46],[W*.45,H*.48],[W*.51,H*.58],[W*.48,H*.73],[W*.39,H*.76],[W*.32,H*.67]],
+      [[W*.49,H*.22],[W*.57,H*.17],[W*.68,H*.19],[W*.77,H*.24],[W*.84,H*.30],[W*.86,H*.39],[W*.81,H*.50],[W*.72,H*.53],[W*.61,H*.48],[W*.53,H*.37]],
+      [[W*.74,H*.58],[W*.79,H*.54],[W*.86,H*.58],[W*.91,H*.67],[W*.89,H*.79],[W*.82,H*.84],[W*.75,H*.77],[W*.72,H*.67]]
+    ];
+    const landColors = ['#2f7f4c','#3f9657','#597d39','#4a8e4e','#638b3e'];
+    landMain.forEach((shape,i)=>drawContinent(ctx, shape, landColors[i], 'rgba(0,0,0,.18)'));
+
+    ctx.fillStyle = 'rgba(204,184,122,.35)';
+    ctx.beginPath(); ctx.ellipse(W*.15,H*.42,W*.07,H*.045,.08,0,TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(W*.33,H*.35,W*.055,H*.03,-.14,0,TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(W*.79,H*.60,W*.075,H*.04,.10,0,TAU); ctx.fill();
+
+    overlayNoiseTint(ctx,W,H,'rgba(12,84,146,1)',.18,10.2,16,7);
+    overlayNoiseTint(ctx,W,H,'rgba(110,160,210,1)',.08,11.2,28,12);
+
+    drawPolarCap(ctx,W*.14,H*.07,W*.16,H*.075,.88);
+    drawPolarCap(ctx,W*.82,H*.93,W*.18,H*.085,.92);
+    drawCloudStreaks(ctx,W,H,Math.round(W*.09),'rgba(255,255,255,.18)');
+    drawSwirlArcs(ctx,W,H,22,'rgba(255,255,255,.08)','rgba(255,255,255,.03)');
+    addLatitudinalHaze(ctx,W,H,'rgba(255,255,255,.028)',12);
+    applySpecularRim(ctx,W,H,.06);
+    planetTextures.earth = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#ff9d6f'],[.22,'#d86a47'],[.54,'#a53a22'],[1,'#5b160d']]);
+    overlayNoiseTint(ctx,W,H,'rgba(127,44,24,1)',.34,4.7,18,10);
+    overlayNoiseTint(ctx,W,H,'rgba(244,153,98,1)',.22,9.3,20,12);
+
+    ctx.fillStyle='rgba(100,40,22,.36)';
+    const darkRegions = [
+      [W*.10,H*.34,W*.16,H*.08,.10],
+      [W*.35,H*.43,W*.18,H*.09,-.18],
+      [W*.60,H*.24,W*.13,H*.06,.20],
+      [W*.74,H*.56,W*.15,H*.09,-.08],
+      [W*.87,H*.36,W*.11,H*.05,.16]
+    ];
+    darkRegions.forEach(r=>{ctx.beginPath();ctx.ellipse(r[0],r[1],r[2],r[3],r[4],0,TAU);ctx.fill();});
+
+    ctx.strokeStyle='rgba(120,42,24,.22)';
+    ctx.lineWidth=6;
+    ctx.beginPath();
+    ctx.moveTo(W*.18,H*.40);
+    ctx.bezierCurveTo(W*.32,H*.44,W*.42,H*.47,W*.52,H*.54);
+    ctx.bezierCurveTo(W*.61,H*.60,W*.72,H*.62,W*.84,H*.68);
+    ctx.stroke();
+
+    drawPolarCap(ctx,W*.18,H*.09,W*.12,H*.05,.88);
+    drawPolarCap(ctx,W*.80,H*.92,W*.15,H*.06,.84);
+    addCraterField(ctx,W,H,Math.round(W*.08),'rgba(70,20,12,.24)','rgba(255,255,255,.04)',4,24);
+    drawSwirlArcs(ctx,W,H,36,'rgba(255,200,160,.03)','rgba(130,40,18,.05)');
+    applySpecularRim(ctx,W,H,.07);
+    planetTextures.mars = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#f1d7b1'],[.18,'#d5a56d'],[.44,'#ad754b'],[.72,'#d6ab79'],[1,'#8b6547']]);
+    drawCurvedBands(ctx,W,H,34,H*.042,22,(i)=>[
+      'rgba(255,227,195,.28)','rgba(204,155,106,.20)','rgba(237,203,158,.22)','rgba(155,103,67,.18)','rgba(201,146,100,.18)','rgba(114,75,46,.13)','rgba(236,194,146,.18)','rgba(170,115,72,.16)'
+    ][i % 8], .055);
+    drawSwirlArcs(ctx,W,H,115,'rgba(255,250,236,.055)','rgba(96,58,32,.06)');
+
+    const cx = W*.34, cy = H*.57, spotRx = W*.11, spotRy = H*.072;
+    const g = ctx.createRadialGradient(cx,cy,0, cx,cy,spotRx*1.1);
+    g.addColorStop(0,'rgba(207,116,71,.96)');
+    g.addColorStop(.52,'rgba(160,74,45,.88)');
+    g.addColorStop(.9,'rgba(105,43,24,.38)');
+    g.addColorStop(1,'rgba(105,43,24,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.ellipse(cx,cy,spotRx,spotRy,-.09,0,TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,186,146,.28)';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(cx,cy,spotRx*.68,spotRy*.68,-.15,0,TAU); ctx.stroke();
+
+    addLatitudinalHaze(ctx,W,H,'rgba(255,255,255,.025)',20);
+    applySpecularRim(ctx,W,H,.10);
+    planetTextures.jupiter = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#f7e7bb'],[.18,'#ebd098'],[.42,'#c59b59'],[.68,'#a17743'],[1,'#8f6b3e']]);
+    drawCurvedBands(ctx,W,H,30,H*.045,9,(i)=>[
+      'rgba(255,241,204,.22)','rgba(214,184,123,.15)','rgba(168,128,76,.14)','rgba(237,210,158,.20)','rgba(131,98,58,.12)'
+    ][i % 5], .045);
+    drawSwirlArcs(ctx,W,H,78,'rgba(255,244,220,.045)','rgba(120,84,40,.05)');
+    addLatitudinalHaze(ctx,W,H,'rgba(255,255,255,.025)',18);
+    applySpecularRim(ctx,W,H,.08);
+    planetTextures.saturn = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#dbfdff'],[.25,'#b8eff5'],[.52,'#8bd7e3'],[1,'#407e8d']]);
+    drawCurvedBands(ctx,W,H,14,H*.06,5,(i)=>[
+      'rgba(255,255,255,.08)','rgba(158,233,241,.10)','rgba(85,166,180,.08)','rgba(226,251,255,.07)'
+    ][i % 4], .03);
+    overlayNoiseTint(ctx,W,H,'rgba(210,248,255,1)',.08,14.1,14,8);
+    drawCloudStreaks(ctx,W,H,20,'rgba(255,255,255,.04)');
+    applySpecularRim(ctx,W,H,.06);
+    planetTextures.uranus = c;
+  }
+
+  {
+    const c=createTextureCanvas(W,H), ctx=c.getContext('2d');
+    bandGradient(ctx,W,H,[[0,'#9bb5ff'],[.18,'#6283f1'],[.46,'#2b50ce'],[1,'#13236f']]);
+    drawCurvedBands(ctx,W,H,18,H*.055,10,(i)=>[
+      'rgba(184,210,255,.08)','rgba(75,103,220,.09)','rgba(41,58,163,.10)','rgba(140,170,255,.07)'
+    ][i % 4], .04);
+    drawSwirlArcs(ctx,W,H,42,'rgba(176,198,255,.045)','rgba(22,42,150,.055)');
+    const storm = ctx.createRadialGradient(W*.69,H*.58,6,W*.69,H*.58,W*.085);
+    storm.addColorStop(0,'rgba(24,37,132,.78)');
+    storm.addColorStop(.55,'rgba(19,33,104,.40)');
+    storm.addColorStop(1,'rgba(24,37,132,0)');
+    ctx.fillStyle = storm;
+    ctx.beginPath(); ctx.ellipse(W*.69,H*.58,W*.07,H*.05,.12,0,TAU); ctx.fill();
+    drawCloudStreaks(ctx,W,H,24,'rgba(255,255,255,.05)');
+    applySpecularRim(ctx,W,H,.08);
+    planetTextures.neptune = c;
+  }
+}
+
+function initSolar(){
+  initSprites();
+  buildPlanetTextures();
+
+  const canvas = document.getElementById('solarCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let hovered = null;
+  let dpr = 1;
+  let width = 0;
+  let height = 0;
+  let last = 0;
+
+  let galaxyCache = null;
+  let twinkleStars = [];
+  let nearStars = [];
+  let dustMotes = [];
+  let nebulaClouds = [];
+  let asteroidField = [];
+
+  function resize(){
+    qualityProfile = getQualityProfile();
+    buildPlanetTextures();
+
+    dpr = Math.min(window.devicePixelRatio || 1, qualityProfile.dprCap);
+    width = canvas.clientWidth;
+    height = canvas.clientHeight;
+
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    buildGalaxyCache();
+    buildSceneObjects();
+  }
+
+  function buildSceneObjects(){
+    nearStars = [];
+    dustMotes = [];
+    nebulaClouds = [];
+    asteroidField = [];
+
+    const starColors = ['255,255,255','214,229,255','255,222,178','190,215,255'];
+    for(let i=0;i<qualityProfile.near;i++){
+      nearStars.push({
+        x: Math.random()*width,
+        y: Math.random()*height,
+        r: rand(.8,2.4),
+        color: starColors[(Math.random()*starColors.length)|0],
+        phase: Math.random()*TAU,
+        speed: rand(.7,1.8),
+        depth: rand(.04,.10)
+      });
+    }
+
+    for(let i=0;i<qualityProfile.dust;i++){
+      dustMotes.push({
+        x: Math.random()*width,
+        y: Math.random()*height,
+        r: rand(.7,1.8),
+        alpha: rand(.035,.085),
+        vx: rand(-.010,.010),
+        vy: rand(-.006,.006),
+        depth: rand(.04,.12)
+      });
+    }
+
+    const cloudColors = ['99,74,220', '0,182,255', '255,86,186', '255,181,90'];
+    for(let i=0;i<qualityProfile.clouds;i++){
+      nebulaClouds.push({
+        x: rand(-100,width+100),
+        y: rand(-80,height+80),
+        r: rand(140,260),
+        dx: rand(-8,8),
+        dy: rand(-6,6),
+        phase: Math.random()*TAU,
+        speed: rand(.05,.11),
+        colorKey: cloudColors[i%cloudColors.length],
+        depth: rand(.02,.06)
+      });
+    }
+
+    for(let i=0;i<qualityProfile.asteroid;i++){
+      asteroidField.push({
+        angle: Math.random()*TAU,
+        dist: rand(242,282),
+        size: rand(.45,1.6),
+        speed: rand(.45,.95),
+        shade: Math.random()>.5 ? '#8b8e97' : '#6d6458'
+      });
+    }
+  }
+
+  function paintNebula(b,x,y,r,innerColor,midColor='rgba(255,255,255,.02)'){
+    const g = b.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,innerColor);
+    g.addColorStop(.46,midColor);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    b.fillStyle = g;
+    b.beginPath();
+    b.arc(x,y,r,0,TAU);
+    b.fill();
+  }
+
+  function paintGlowDot(b,x,y,size,rgb,alpha=1){
+    const g=b.createRadialGradient(x,y,0,x,y,size*4.2);
+    g.addColorStop(0,`rgba(${rgb},${alpha})`);
+    g.addColorStop(.45,`rgba(${rgb},${alpha*.18})`);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    b.fillStyle=g;
+    b.beginPath();
+    b.arc(x,y,size*4.2,0,TAU);
+    b.fill();
+
+    b.fillStyle=`rgba(${rgb},${Math.min(alpha,1)})`;
+    b.beginPath();
+    b.arc(x,y,size,0,TAU);
+    b.fill();
+  }
+
+  function buildGalaxyCache(){
+    const pad=180;
+    const c=document.createElement('canvas');
+    c.width=width+pad*2;
+    c.height=height+pad*2;
+    const b=c.getContext('2d');
+    const w=c.width, h=c.height;
+
+    const bg=b.createRadialGradient(w*.5,h*.5,0,w*.5,h*.55,Math.max(w,h)*.82);
+    bg.addColorStop(0,'#081225');
+    bg.addColorStop(.34,'#040915');
+    bg.addColorStop(1,'#000000');
+    b.fillStyle=bg;
+    b.fillRect(0,0,w,h);
+
+    paintNebula(b,w*.20,h*.24,w*.34,'rgba(110,75,215,.15)','rgba(60,30,120,.07)');
+    paintNebula(b,w*.78,h*.20,w*.28,'rgba(45,135,210,.12)','rgba(30,65,120,.05)');
+    paintNebula(b,w*.60,h*.78,w*.30,'rgba(148,53,168,.09)','rgba(55,25,82,.04)');
+    paintNebula(b,w*.10,h*.82,w*.23,'rgba(34,139,173,.08)','rgba(15,60,70,.03)');
+
+    b.save();
+    b.translate(w*.53,h*.46);
+    b.rotate(-0.42);
+
+    const band = b.createLinearGradient(0,-h*.12,0,h*.12);
+    band.addColorStop(0,'rgba(255,255,255,0)');
+    band.addColorStop(.2,'rgba(166,190,255,.04)');
+    band.addColorStop(.5,'rgba(255,230,205,.14)');
+    band.addColorStop(.82,'rgba(166,190,255,.05)');
+    band.addColorStop(1,'rgba(255,255,255,0)');
+    b.fillStyle=band;
+    b.fillRect(-w*.68,-h*.12,w*1.36,h*.24);
+
+    for(let i=0;i<qualityProfile.clouds*24;i++){
+      const x=rand(-w*.62,w*.62);
+      const y=rand(-h*.08,h*.08);
+      const r=rand(20,72);
+      const g=b.createRadialGradient(x,y,0,x,y,r);
+      const warm=Math.random()>.54;
+      g.addColorStop(0,warm?'rgba(255,232,210,.07)':'rgba(190,210,255,.06)');
+      g.addColorStop(1,'rgba(255,255,255,0)');
+      b.fillStyle=g;
+      b.beginPath();
+      b.arc(x,y,r,0,TAU);
+      b.fill();
+    }
+    b.restore();
+
+    const starColors=['255,255,255','214,229,255','255,222,178','190,215,255'];
+    for(let i=0;i<qualityProfile.farStars;i++){
+      paintGlowDot(
+        b,
+        Math.random()*w,
+        Math.random()*h,
+        Math.random()<.92?rand(.25,.95):rand(1.1,2.0),
+        starColors[(Math.random()*starColors.length)|0],
+        Math.random()<.9?rand(.16,.72):rand(.65,.95)
+      );
+    }
+
+    twinkleStars = [];
+    for(let i=0;i<qualityProfile.twinkle;i++){
+      twinkleStars.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        size: rand(.8,2.1),
+        phase: Math.random()*TAU,
+        speed: rand(.7,1.7),
+        color: starColors[(Math.random()*starColors.length)|0]
+      });
+    }
+
+    galaxyCache = {canvas:c,pad,w,h};
+  }
+
+  function drawBackground(time, dt){
+    if(!galaxyCache) return;
+    const p = galaxyCache.pad;
+    const parX = panX * .03 - p;
+    const parY = panY * .03 - p;
+    ctx.drawImage(galaxyCache.canvas, parX, parY, galaxyCache.w, galaxyCache.h);
+
+    nebulaClouds.forEach(cloud => {
+      const t = time * 0.001 * cloud.speed + cloud.phase;
+      const x = cloud.x + Math.sin(t)*cloud.dx + panX*cloud.depth;
+      const y = cloud.y + Math.cos(t*.8)*cloud.dy + panY*cloud.depth;
+      const sprite = spriteCache.clouds[cloud.colorKey];
+      const size = cloud.r * 2;
+      if (sprite) ctx.drawImage(sprite, x - cloud.r, y - cloud.r, size, size);
+    });
+
+    ctx.globalCompositeOperation = 'screen';
+    twinkleStars.forEach(s => {
+      const tw = .38 + .62 * (Math.sin(time*.001*s.speed + s.phase)*.5 + .5);
+      ctx.globalAlpha = tw * 0.8;
+      const sprite = spriteCache.stars[s.color];
+      const size = s.size * 8.4;
+      if (sprite) ctx.drawImage(sprite, s.x + parX - size/2, s.y + parY - size/2, size, size);
+    });
+
+    nearStars.forEach(s => {
+      const tw = .48 + .52*(Math.sin(time*.0014*s.speed + s.phase)*.5 + .5);
+      ctx.globalAlpha = tw * 0.82;
+      const x = s.x + panX*s.depth;
+      const y = s.y + panY*s.depth;
+      const sprite = spriteCache.stars[s.color];
+      const size = s.r * 8.4;
+      if (sprite) ctx.drawImage(sprite, x - size/2, y - size/2, size, size);
+    });
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#ffffff';
+    dustMotes.forEach(d => {
+      d.x += d.vx * dt * 60;
+      d.y += d.vy * dt * 60;
+      if(d.x < -10) d.x = width + 10;
+      if(d.x > width + 10) d.x = -10;
+      if(d.y < -10) d.y = height + 10;
+      if(d.y > height + 10) d.y = -10;
+
+      ctx.globalAlpha = d.alpha;
+      const x = d.x + panX*d.depth;
+      const y = d.y + panY*d.depth;
+      ctx.fillRect(x - d.r, y - d.r, d.r*2, d.r*2);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function updateInfo(){
+    const box = document.getElementById('solarInfo');
+    if(hovered){
+      box.innerHTML = `
+        <b>${hovered.name}</b>
+        <span>${hovered.info}</span>
+        <small>При увеличении текстуры и освещение становятся заметно детальнее.</small>
+      `;
+    }else{
+      box.innerHTML = `
+        <b>Наведи или тапни на планету</b>
+        <span>Потяни сцену пальцем, чтобы смещать камеру. Щипок меняет масштаб.</span>
+        <small>Кнопки внизу управляют масштабом и углом обзора.</small>
+      `;
+    }
+  }
+
+  function calculateHover(mx, my){
+    const sunX = width/2 + panX;
+    const sunY = height/2 + panY;
+    hovered = null;
+
+    for(let i=SOLAR_DATA.length-1;i>=0;i--){
+      const p = SOLAR_DATA[i];
+      const px = Math.cos(solarAngles[i]) * p.dist;
+      const py = Math.sin(solarAngles[i]) * p.dist;
+      const sx = sunX + px * camZoom;
+      const sy = sunY + py * camTilt * camZoom;
+      const pr = Math.max(3, p.r * camZoom);
+      if(Math.hypot(mx-sx, my-sy) < pr + 10){
+        hovered = p;
+        break;
+      }
+    }
+    updateInfo();
+  }
+
+  function touchDistance(touches){
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx,dy);
+  }
+
+  function clipSphere(x,y,r,fn){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,TAU);
+    ctx.clip();
+    fn();
+    ctx.restore();
+  }
+
+  function drawAtmosphereShell(x,y,r,p,lightAngle){
+    if(!['earth','venus','neptune','uranus'].includes(p.id)) return;
+    const glowColor = {
+      earth: ['rgba(120,220,255,.22)','rgba(58,151,255,.22)'],
+      venus: ['rgba(255,225,170,.12)','rgba(255,182,92,.12)'],
+      uranus:['rgba(172,245,255,.14)','rgba(105,220,245,.12)'],
+      neptune:['rgba(142,182,255,.16)','rgba(75,118,255,.15)']
+    }[p.id];
+
+    const g = ctx.createRadialGradient(x,y,r*.82,x,y,r*1.22);
+    g.addColorStop(0,'rgba(255,255,255,0)');
+    g.addColorStop(.66,glowColor[0]);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x,y,r*1.22,0,TAU);
+    ctx.fill();
+
+    const rimX = x + Math.cos(lightAngle) * r * .26;
+    const rimY = y + Math.sin(lightAngle) * r * .26;
+    const rim = ctx.createRadialGradient(rimX,rimY,r*.18,x,y,r*1.28);
+    rim.addColorStop(0,glowColor[1]);
+    rim.addColorStop(.55,'rgba(255,255,255,0)');
+    rim.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = rim;
+    ctx.beginPath();
+    ctx.arc(x,y,r*1.28,0,TAU);
+    ctx.fill();
+  }
+
+  function drawTexturedSphere(p, x, y, r, time, lightAngle){
+    const tex = planetTextures[p.id];
+    const texW = tex.width;
+    const texH = tex.height;
+    const drawW = r * 4.4;
+    const drawH = r * 2.2;
+    const scroll = ((time * 0.00003 * p.rotation * texW) % texW + texW) % texW;
+
+    drawAtmosphereShell(x,y,r,p,lightAngle);
+
+    clipSphere(x,y,r,()=>{
+      ctx.fillStyle = '#000';
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      for(let i=-1;i<=1;i++){
+        ctx.drawImage(tex, x - drawW/2 - scroll*(drawW/texW) + i*drawW, y - drawH/2, drawW, drawH);
+      }
+
+      const axialShading = ctx.createLinearGradient(x-r,y-r*0.6,x+r,y+r*0.4);
+      axialShading.addColorStop(0,'rgba(255,255,255,.08)');
+      axialShading.addColorStop(.45,'rgba(255,255,255,0)');
+      axialShading.addColorStop(1,'rgba(0,0,0,.16)');
+      ctx.fillStyle = axialShading;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      const lx = x + Math.cos(lightAngle) * r * .34;
+      const ly = y + Math.sin(lightAngle) * r * .34;
+      const light = ctx.createRadialGradient(lx,ly,0,x,y,r*1.12);
+      light.addColorStop(0,'rgba(255,255,255,.34)');
+      light.addColorStop(.26,'rgba(255,255,255,.12)');
+      light.addColorStop(.55,'rgba(255,255,255,.03)');
+      light.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle = light;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,TAU);
+      ctx.fill();
+
+      const terminatorX = x - Math.cos(lightAngle) * r * .48;
+      const terminatorY = y - Math.sin(lightAngle) * r * .48;
+      const shadow = ctx.createRadialGradient(terminatorX,terminatorY,r*.08,x,y,r*1.16);
+      shadow.addColorStop(0,'rgba(0,0,0,.06)');
+      shadow.addColorStop(.45,'rgba(0,0,0,.24)');
+      shadow.addColorStop(1,'rgba(0,0,0,.88)');
+      ctx.fillStyle = shadow;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,TAU);
+      ctx.fill();
+
+      const fresnel = ctx.createRadialGradient(x,y,r*.55,x,y,r*1.03);
+      fresnel.addColorStop(0,'rgba(255,255,255,0)');
+      fresnel.addColorStop(.72,'rgba(255,255,255,0)');
+      fresnel.addColorStop(.92,'rgba(255,255,255,.06)');
+      fresnel.addColorStop(1,'rgba(255,255,255,.12)');
+      ctx.fillStyle = fresnel;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,TAU);
+      ctx.fill();
+    });
+
+    const ambientGlow = ctx.createRadialGradient(x,y,r*.76,x,y,r*1.55);
+    ambientGlow.addColorStop(0,'rgba(255,255,255,0)');
+    ambientGlow.addColorStop(.72,'rgba(255,255,255,0)');
+    ambientGlow.addColorStop(1,'rgba(255,255,255,.045)');
+    ctx.fillStyle = ambientGlow;
+    ctx.beginPath();
+    ctx.arc(x,y,r*1.55,0,TAU);
+    ctx.fill();
+
+    ctx.strokeStyle='rgba(255,255,255,.08)';
+    ctx.lineWidth=Math.max(1, r*.045);
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,TAU);
+    ctx.stroke();
+
+    if(hovered === p){
+      ctx.strokeStyle='rgba(255,255,255,.72)';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.arc(x,y,r+2.5,0,TAU);
+      ctx.stroke();
+
+      ctx.fillStyle='rgba(255,255,255,.96)';
+      ctx.font=`600 ${Math.max(11,13*camZoom)}px Exo 2, sans-serif`;
+      ctx.textAlign='center';
+      ctx.fillText(p.name, x, y - r - (10*camZoom));
+    }
+  }
+
+  function drawSun(x,y,r,time){
+    const pulse = 1 + Math.sin(time*.0015)*.035;
+    const glowR = r * 2.55 * pulse;
+
+    const glow = ctx.createRadialGradient(x,y,0,x,y,glowR);
+    glow.addColorStop(0,'rgba(255,245,170,.96)');
+    glow.addColorStop(.16,'rgba(255,190,60,.70)');
+    glow.addColorStop(.42,'rgba(255,106,0,.36)');
+    glow.addColorStop(1,'rgba(255,70,0,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x,y,glowR,0,TAU);
+    ctx.fill();
+
+    clipSphere(x,y,r,()=>{
+      const core = ctx.createRadialGradient(x-r*.18,y-r*.18,0,x,y,r*1.05);
+      core.addColorStop(0,'#fff7b0');
+      core.addColorStop(.3,'#ffd447');
+      core.addColorStop(.62,'#ff9d1f');
+      core.addColorStop(1,'#d44b00');
+      ctx.fillStyle = core;
+      ctx.fillRect(x-r,y-r,r*2,r*2);
+
+      for(let i=0;i<10;i++){
+        ctx.strokeStyle = i%2===0 ? 'rgba(255,230,150,.15)' : 'rgba(255,130,40,.13)';
+        ctx.lineWidth = r*.065;
+        ctx.beginPath();
+        ctx.arc(
+          x + Math.sin(time*.001 + i)*r*.1,
+          y + Math.cos(time*.0012 + i)*r*.1,
+          r*(.28 + .055*i),
+          i*.42,
+          i*.42 + Math.PI*.88
+        );
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawRing(x,y,r,front=false){
+    const inner = r*1.45;
+    const outer = r*2.52;
+    const tilt = camTilt*.82;
+
+    ctx.save();
+    if(front){
+      ctx.beginPath();
+      ctx.rect(x-outer-20,y,(outer+20)*2,outer*tilt+32);
+      ctx.clip();
+    }else{
+      ctx.beginPath();
+      ctx.rect(x-outer-20,y-outer*tilt-32,(outer+20)*2,outer*tilt+32);
+      ctx.clip();
+    }
+
+    for(let i=0;i<18;i++){
+      const t=i/17;
+      const rr = inner + (outer-inner)*t;
+      ctx.beginPath();
+      ctx.ellipse(x,y,rr,rr*tilt,0,0,TAU);
+      const alpha = .06 + (1-t) * .16;
+      ctx.strokeStyle = i % 3 === 0
+        ? `rgba(255,244,215,${alpha})`
+        : i % 2 === 0
+          ? `rgba(220,203,165,${alpha * .9})`
+          : `rgba(155,135,110,${alpha * .72})`;
+      ctx.lineWidth = Math.max(.75, r*.016 + (1-t)*r*.022);
+      ctx.stroke();
+    }
+
+    const gap = ctx.createLinearGradient(x-outer,y,x+outer,y);
+    gap.addColorStop(0,'rgba(255,255,255,.04)');
+    gap.addColorStop(.18,'rgba(255,255,255,.01)');
+    gap.addColorStop(.5,'rgba(0,0,0,.05)');
+    gap.addColorStop(.82,'rgba(255,255,255,.01)');
+    gap.addColorStop(1,'rgba(255,255,255,.04)');
+    ctx.strokeStyle = gap;
+    ctx.lineWidth = Math.max(1.2, r * .06);
+    ctx.beginPath();
+    ctx.ellipse(x,y,r*1.92,r*1.92*tilt,0,0,TAU);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMoonSystem(p, planetX, planetY, planetR, time){
+    const moons = MOON_DATA.filter(m=>m.host===p.id);
+    moons.forEach((m, idx)=>{
+      const a = time*0.0007*m.speed + idx*1.7;
+      const orbit = planetR * m.orbit;
+      const mx = planetX + Math.cos(a) * orbit;
+      const my = planetY + Math.sin(a) * orbit * camTilt;
+      const mr = Math.max(1, planetR * m.size);
+
+      ctx.strokeStyle='rgba(255,255,255,.04)';
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.ellipse(planetX, planetY, orbit, orbit*camTilt, 0, 0, TAU);
+      ctx.stroke();
+
+      const g = ctx.createRadialGradient(mx-mr*.2,my-mr*.2,0,mx,my,mr*1.2);
+      g.addColorStop(0,'rgba(255,255,255,.75)');
+      g.addColorStop(.44,m.color);
+      g.addColorStop(1,'rgba(18,18,28,.95)');
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.arc(mx,my,mr,0,TAU);
+      ctx.fill();
+    });
+  }
+
+  function drawAsteroidBelt(sunX,sunY,time){
+    asteroidField.forEach((a,i)=>{
+      const ang = a.angle + time*0.00003*a.speed + i*0.0001;
+      const px = Math.cos(ang) * a.dist;
+      const py = Math.sin(ang) * a.dist;
+      const x = sunX + px * camZoom;
+      const y = sunY + py * camTilt * camZoom;
+      const s = Math.max(.35, a.size * camZoom);
+      ctx.fillStyle = a.shade;
+      ctx.beginPath();
+      ctx.ellipse(x,y,s*1.2,s,ang,0,TAU);
+      ctx.fill();
+    });
+  }
+
+  function drawVignette(){
+    const g = ctx.createRadialGradient(width/2,height/2,Math.min(width,height)*.22,width/2,height/2,Math.max(width,height)*.78);
+    g.addColorStop(0,'rgba(0,0,0,0)');
+    g.addColorStop(.66,'rgba(0,0,0,0)');
+    g.addColorStop(1,'rgba(0,0,0,.40)');
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,width,height);
+  }
+
+  canvas.addEventListener('mousedown', e=>{
+    isDragging = true;
+    dragStartX = e.clientX - targetPanX;
+    dragStartY = e.clientY - targetPanY;
+  });
+  window.addEventListener('mouseup', ()=>{ isDragging = false; });
+
+  canvas.addEventListener('mousemove', e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left;
+    const my=e.clientY-rect.top;
+
+    if(isDragging){
+      targetPanX = e.clientX - dragStartX;
+      targetPanY = e.clientY - dragStartY;
+    }
+    calculateHover(mx,my);
+  });
+
+  canvas.addEventListener('wheel', e=>{
+    e.preventDefault();
+    adjustZoom(e.deltaY<0 ? .12 : -.12);
+  }, {passive:false});
+
+  canvas.addEventListener('touchstart', e=>{
+    if(e.touches.length===1){
+      isDragging = true;
+      dragStartX = e.touches[0].clientX - targetPanX;
+      dragStartY = e.touches[0].clientY - targetPanY;
+    }else if(e.touches.length===2){
+      isDragging = false;
+      lastPinchDist = touchDistance(e.touches);
+    }
+
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.touches[0].clientX-rect.left;
+    const my=e.touches[0].clientY-rect.top;
+    calculateHover(mx,my);
+  }, {passive:true});
+
+  canvas.addEventListener('touchmove', e=>{
+    const rect=canvas.getBoundingClientRect();
+
+    if(e.touches.length===1 && isDragging){
+      targetPanX = e.touches[0].clientX - dragStartX;
+      targetPanY = e.touches[0].clientY - dragStartY;
+      const mx=e.touches[0].clientX-rect.left;
+      const my=e.touches[0].clientY-rect.top;
+      calculateHover(mx,my);
+    }else if(e.touches.length===2){
+      e.preventDefault();
+      const currentDist = touchDistance(e.touches);
+      const delta = (currentDist - lastPinchDist) * 0.006;
+      targetZoom = clamp(targetZoom + delta, .45, 4.2);
+      lastPinchDist = currentDist;
+    }
+  }, {passive:false});
+
+  canvas.addEventListener('touchend', ()=>{ isDragging = false; });
+
+  function draw(ts){
+    if(!document.getElementById('solar').classList.contains('active')){
+      requestAnimationFrame(draw);
+      return;
+    }
+
+    const dt = last ? Math.min((ts-last)/1000, .05) : 0;
+    last = ts;
+    camZoom += (targetZoom - camZoom) * .16;
+    camTilt += (targetTilt - camTilt) * .18;
+    panX += (targetPanX - panX) * .20;
+    panY += (targetPanY - panY) * .20;
+
+    ctx.clearRect(0,0,width,height);
+    drawBackground(ts, dt);
+
+    const sunX = width/2 + panX;
+    const sunY = height/2 + panY;
+
+    SOLAR_DATA.forEach((p,i)=>{
+      solarAngles[i] += dt * (2*Math.PI/(p.period*1.8));
+    });
+
+    SOLAR_DATA.forEach((p,i)=>{
+      const orbR = p.dist * camZoom;
+      ctx.beginPath();
+      ctx.ellipse(sunX,sunY,orbR,orbR*camTilt,0,0,TAU);
+      ctx.strokeStyle = i%2===0 ? 'rgba(255,255,255,.045)' : 'rgba(120,170,255,.04)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    drawAsteroidBelt(sunX,sunY,ts);
+
+    const renderQueue = [];
+    renderQueue.push({type:'sun',depth:0});
+
+    SOLAR_DATA.forEach((p,i)=>{
+      const px = Math.cos(solarAngles[i]) * p.dist;
+      const py = Math.sin(solarAngles[i]) * p.dist;
+      renderQueue.push({type:'planet', p, px, py, depth: py * camTilt});
+    });
+
+    renderQueue.sort((a,b)=>a.depth-b.depth);
+
+    renderQueue.forEach(item=>{
+      if(item.type === 'sun'){
+        drawSun(sunX,sunY,32*camZoom,ts);
+        return;
+      }
+
+      const {p,px,py} = item;
+      const x = sunX + px * camZoom;
+      const y = sunY + py * camTilt * camZoom;
+      const r = Math.max(1.6, p.r * camZoom);
+      const lightAngle = Math.atan2(sunY-y, sunX-x);
+
+      const halo = ctx.createRadialGradient(x,y,0,x,y,r*1.8);
+      halo.addColorStop(0,'rgba(255,255,255,0)');
+      halo.addColorStop(.62,'rgba(255,255,255,0)');
+      halo.addColorStop(1,'rgba(255,255,255,.04)');
+      ctx.fillStyle=halo;
+      ctx.beginPath();
+      ctx.arc(x,y,r*1.8,0,TAU);
+      ctx.fill();
+
+      if(p.rings) drawRing(x,y,r,false);
+      drawTexturedSphere(p,x,y,r,ts,lightAngle);
+      if(p.rings) drawRing(x,y,r,true);
+      drawMoonSystem(p,x,y,r,ts);
+    });
+
+    drawVignette();
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  updateInfo();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(draw);
+}
+</script>
+</body>
+</html>
